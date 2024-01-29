@@ -18,7 +18,7 @@ from openai import OpenAI
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY')
-MODEL = 'gpt-4-1106-preview'
+MODEL = 'gpt-4-0125-preview'
 
 TG_TOKEN = os.getenv('TG_TOKEN')
 bot = OpenAI(api_key = API_KEY)
