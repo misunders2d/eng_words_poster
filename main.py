@@ -90,7 +90,8 @@ Please follow the pattern of the below example:\n\n{example}'''
 def main():
     q1, q2 = Queue(), Queue()
     df = connect_to_spreadsheet()
-    print(len(df))
+    remaining = (df['✓'] == 'FALSE').sum()
+    print(f'{remaining} objects remaining out of {len(df)}')
     df = df[df['Posted on'] == '']
     word = random.choice(df['Задача'].values.tolist())
     print(f'The word is {word.upper()}\n\n')
