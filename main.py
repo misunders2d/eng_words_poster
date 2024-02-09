@@ -43,6 +43,7 @@ def generate_image(word,q):
       model="dall-e-3",
       prompt=word,
       size="1024x1024",
+      # size = '1792x1024',
       quality="standard",
       n=1,
     )
@@ -68,7 +69,7 @@ def get_response(word,q):
 тэги: #repugnance #отвращение #неприязнь
     '''
     
-    query = f'''You need to translate and explain the meaning of the word "{word}" to them. Skip all the greetings and to straight to business.
+    query = f'''You need to translate and explain the meaning of the word or phrase "{word}" to them. Skip all the greetings and to straight to business.
 Please end your message with tags which include the word itself and a couple of its Russian translations (remember to replace whitespaces with underscore.Please avoid using mentions of Russia as a country.
 Please follow the pattern of the below example:\n\n{example}'''
     
@@ -107,11 +108,18 @@ def main():
         proc.join()
     os.startfile(os.getcwd())
 
+    split_word = 'тэги:'
+    explanation1, tags = explanation.split(split_word)
+
     chat_id = "330959414"
-    audio_str = f'[Произношение](https://d1qx7pbj0dvboc.cloudfront.net/{word}.mp3)'
+    sound_url = f'https://d1qx7pbj0dvboc.cloudfront.net/{word.replace(" ","%20")}.mp3'
+    audio_str = f'[Прослушать произношение]({sound_url})'
     
-    
-    text_params = {'chat_id':chat_id, 'text':explanation + "\n\n" + audio_str}
+    audio_check = requests.get(sound_url)
+    if audio_check.ok:
+        text_params = {'chat_id':chat_id, 'text':explanation1 + audio_str + '\n\n' + split_word + tags}
+    else:
+        text_params = {'chat_id':chat_id, 'text':explanation}
     
     
     url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
@@ -130,5 +138,5 @@ if __name__ == '__main__':
         main()
     except Exception as e:
         print(e)
-    input('Finish?')
+    print('Done')
 
