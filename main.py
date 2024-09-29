@@ -41,36 +41,17 @@ rewrite_mapping = {
     'EXMP_REWRITE': 'examples'
     }
 
-
-# example1 = '''Here's a good example for the word "flamboyant":
-# "Flamboyant" 🌈✨
-
-# Когда ваша одежда так ярка, что пугает солнечные зайчики... когда ваша личность сверкает ярче, чем диско-шар на лучшей вечеринке города... когда даже ваша собака отказывается выходить на прогулку с вами, потому что её "слишком много"... Вот тогда вы **flamboyant**.
-
-# Перевод: вычурный, экстравагантный, кричащий - слово, которое описывает все, что настолько яркое и броское, что вызывает восхищение у стилистов и лёгкое замешательство у остальных. От пышных розовых пламенеющих фламинго до вашего дяди Васи в его новом зелёном костюме для гольфа - **flamboyant** вокруг нас, и это прекрасно!
-
-# Слово "flamboyant" происходит от французского "flamboyant", что в буквальном переводе означает "пламенеющий". Этот термин, в свою очередь, происходит от французского глагола "flamber", означающего "гореть пламенем" или "вспыхивать". Изначально это слово использовалось для описания стиля архитектуры с обилием украшений, напоминающих пламя, а в современном английском языке "flamboyant" описывает яркость, экстравагантность и выразительность в поведении, стиле или дизайне.
-
-# Использование в предложении:
-    
-# - The designer's latest collection was flamboyant, filled with bright colors and extravagant designs that caught everyone's eye.
-
-# - Последняя коллекция дизайнера была вычурной, наполненной яркими цветами и экстравагантными дизайнами, которые привлекали внимание всех.    
-
-# Используйте это слово, чтобы описать все, что притягивает взгляды в комнате и не оставляет равнодушным. И помните, иногда немного flamboyant-а в жизни - это именно то, что нужно, чтобы сделать серые будни ярче!
-
-# тэги: #flamboyant #вычурный #экстравагантный #кричащий
-# '''
-
-
 def connect_to_spreadsheet():
     try:
         scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
         creds_file = r'.secrets\token.json'
         # if not os.path.isfile(creds_file):
         #     creds_file = input('Input path to creds file')#G:\Shared drives\70 Data & Technology\70.03 Scripts\mellanni_2\google-cloud\competitor_pricing.json
-        creds = ServiceAccountCredentials.from_json_keyfile_name(creds_file, scope)
-        client = gspread.authorize(creds)
+        try:
+            creds = ServiceAccountCredentials.from_json_keyfile_name(creds_file, scope)
+            client = gspread.authorize(creds)
+        except Exception as e:
+            print(e)
         
         #open Google Sheets sheet
         book = client.open_by_key('1TNgDtiUKNFeRDBOSrYEksArLudYhNAh-6A69O9Y9N6k')
@@ -106,22 +87,21 @@ def generate_sound(word: str) -> None:
 
 def assistant_response(word: str, additional_instr: bool = True) -> str:
     if additional_instr:
-        add_instr = 'Start your post with the subjecct word. Make sure to inclue 1-2 relevant emojis after the title word. Do not put single or double quotes around usage examples'
+        add_instr = 'Start your post with the subject word. Make sure to inclue 1-2 relevant emojis after the title word. Do not put single or double quotes around usage examples'
     thread = client.beta.threads.retrieve(thread_id = THREAD_ID)
     content = [{'type':'text','text':word}]
     messages = client.beta.threads.messages.create(thread_id = thread.id, content = content, role = 'user')
-    run = client.beta.threads.runs.create(
+    run = client.beta.threads.runs.create_and_poll(
         thread_id = thread.id,
         assistant_id=ASSISTANT_ID,
         additional_instructions=add_instr if additional_instr else NOT_GIVEN,
-        stream = False,
         truncation_strategy={"type": "last_messages","last_messages": 6})
-    current_status = 'queued'
-    while current_status in ('queued','in_progress'):
-        time.sleep(3)
-        current_run = client.beta.threads.runs.retrieve(thread_id = thread.id, run_id = run.id)
-        current_status = current_run.status
-        print(current_status)
+    # current_status = 'queued'
+    # while current_status in ('queued','in_progress'):
+    #     time.sleep(3)
+    #     current_run = client.beta.threads.runs.retrieve(thread_id = thread.id, run_id = run.id)
+    #     current_status = current_run.status
+    #     print(current_status)
     messages = client.beta.threads.messages.list(thread.id)
     response = messages.data[0].content[0].text.value
     
@@ -130,59 +110,6 @@ def assistant_response(word: str, additional_instr: bool = True) -> str:
     #     chunks.append(chunk)
     return response
 
-# def get_response(word: str, bot = 'openai') -> str:
-    
-#     query = f'''You are asked to translate and explain the meaning of the word or phrase "{word}" to them.
-# Do so in a fun and smart humored manner, so that the chances of remembering this word or phrase are increased.
-# You may use a game of words, if applicable. Add 2-3 sentences describing the origin of the word, if applicable. Add a usage example. Skip all the greetings and to straight to business.
-# Please end your message with tags which include the word itself and a couple of its Russian translations (remember to replace whitespaces with underscore).
-# Please avoid using mentions of Russia as a country.
-# Create your description in Russian, avoid making grammatical mistakes. Make sure to provide both English version and Russian translation when you are giving usage examples.
-# Please follow the pattern of the below example (or stay close to it), make sure to inclue 1-2 relevant emojis after the title word:\n\n{example1}'''
-    
-#     messages = [
-#         {'role':'system', 'content':'You are a Russian teacher who teaches English language to Russian students. Your main language of communication is Russian'},
-#         {'role':'user', 'content':query}
-#         ]
-#     if bot == 'openai':
-#         response = client.chat.completions.create(messages = messages, model = MODEL)#, stream = True)
-#     # chunks = []
-#     # explanation = ''
-#     # for chunk in response:
-#     #     if chunk.choices[0].delta.content is not None:
-#     #         print(chunk.choices[0].delta.content, end = '')
-#     #         chunks.append(chunk)
-#     # for chunk in chunks:
-#     #     explanation += chunk.choices[0].delta.content
-#     else:
-#         response = client2.messages.create(max_tokens = 2048, messages = messages, model = "claude-3-5-sonnet-20240620")
-    
-#     explanation = response.choices[0].message.content
-    
-#     return explanation
-
-def check_explanation(explanation: str) -> str:
-    query = f'''Please check the following text and correct any grammatical or stylistic errors.
-    Do not alter the text except for the corrections you are making:\n\n{explanation}'''
-    messages = [
-        {'role':'system', 'content':'You are a copywriter capable of checking text and correcting mistakes.'},
-        {'role':'user', 'content':query}
-        ]
-    
-    response = client.chat.completions.create(messages = messages, model = MODEL, stream = True)
-    # if response.choices[0].finish_reason == 'stop':
-    #     corrected = response.choices[0].message.content
-    # else:
-    #     corrected = 'Error occurred'
-    chunks = []
-    corrected = ''
-    for chunk in response:
-        if chunk.choices[0].delta.content is not None:
-            print(chunk.choices[0].delta.content, end = '')
-            chunks.append(chunk)
-    for chunk in chunks:
-        corrected += chunk.choices[0].delta.content        
-    return corrected
 
 def summarize(month: date):
     def extract_hashtags(text):
@@ -208,10 +135,10 @@ def summarize(month: date):
     return '\n'.join(words.values)
 
 def get_available_words(spreadsheet: pd.DataFrame) -> list:
-    remaining = (spreadsheet['✓'] == 'FALSE').sum()
+    remaining = len(spreadsheet[(spreadsheet['✓'] == 'FALSE') & (spreadsheet['Задача'] != '')])
     spreadsheet = spreadsheet[(spreadsheet['Posted on'] == '') & (spreadsheet['Задача'] != '')]
     words = spreadsheet['Задача'].unique().tolist()
-    return words, f'{remaining} objects remaining out of {len(spreadsheet)}'
+    return words, f'{remaining} objects remaining out of {len(spreadsheet)+remaining}'
     
 def select_word(words: list) -> str:
     return random.choice(words).upper()
@@ -331,7 +258,7 @@ def main():
         
         elif event == 'FINISHED':
             payload = values['FINISHED']
-            window['POST'].update(visible = True)
+            window['POST'].update(disabled = False, visible = True)
         
         elif event == 'POST':
             window['POST'].update(disabled = True)
