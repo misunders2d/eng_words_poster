@@ -4,4 +4,4 @@ pandas
 python-dotenv
 oauth2client
 pyarrow
-PySimpleGUI==4.59.0
+PySimpleGUI

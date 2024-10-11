@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 15 18:53:01 2023
-
-@author: Sergey
-"""
-
 import random, gspread, os, time
 import PySimpleGUI as sg
 from datetime import date
@@ -17,7 +10,7 @@ import re
 from oauth2client.service_account import ServiceAccountCredentials
 
 from openai import OpenAI, NOT_GIVEN
-import anthropic
+# import anthropic
 
 ASSISTANT_ID = 'asst_9RsOhqrpjyfCtKqlJQCb56Va'  
 # THREAD_ID = 'thread_bkuZx2KYrj27MxilUBDmXP5x'#'thread_YfDGV3jGfkSo4pBtbkpC5CqG' - to delete
@@ -32,7 +25,7 @@ MODEL = 'gpt-4o'
 
 TG_TOKEN = os.getenv('TG_TOKEN')
 client = OpenAI(api_key = API_KEY)
-client2 = anthropic.Anthropic(api_key = ANTHROPIC_KEY)
+# client2 = anthropic.Anthropic(api_key = ANTHROPIC_KEY)
 CHAT_ID = "330959414"
 
 rewrite_mapping = {
@@ -44,7 +37,7 @@ rewrite_mapping = {
 def connect_to_spreadsheet():
     try:
         scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds_file = r'.secrets\token.json'
+        creds_file = '.secrets/token.json'
         # if not os.path.isfile(creds_file):
         #     creds_file = input('Input path to creds file')#G:\Shared drives\70 Data & Technology\70.03 Scripts\mellanni_2\google-cloud\competitor_pricing.json
         try:
