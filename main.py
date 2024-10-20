@@ -20,7 +20,7 @@ THREAD_ID = 'thread_FJLF4PcM5UbEgcLWLs3A3wri' #testing thread, delete later
 load_dotenv()
 
 API_KEY = os.getenv('API_KEY')
-ANTHROPIC_KEY = os.getenv('ANTHROPIC_KEY')
+# ANTHROPIC_KEY = os.getenv('ANTHROPIC_KEY')
 MODEL = 'gpt-4o'
 
 TG_TOKEN = os.getenv('TG_TOKEN')
