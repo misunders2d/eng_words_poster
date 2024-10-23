@@ -234,7 +234,7 @@ def main():
             break
         elif event == 'Delete thread':
             thread_id = sg.PopupGetText('Thread to delete?')
-            delete_thread(thread_id=)
+            delete_thread(thread_id)
         elif event == 'READ_SPREADSHEET':
             df = connect_to_spreadsheet()
             words, remaining = get_available_words(df)
