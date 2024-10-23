@@ -34,6 +34,12 @@ rewrite_mapping = {
     'EXMP_REWRITE': 'examples'
     }
 
+def delete_thread(thread_id):
+    try:
+        client.beta.threads.delete(thread_id = thread_id)
+    except Exception as e:
+        print(e)
+
 def connect_to_spreadsheet():
     try:
         scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
@@ -216,7 +222,7 @@ def main():
         [sg.Button('Read spreadsheet', disabled=spreadsheet_btn_visibility, key = 'READ_SPREADSHEET'),
          sg.Button('Get word', disabled= not spreadsheet_btn_visibility, key = 'GET_WORD'),
          sg.Button('Post', visible = False, key = 'POST')],
-        [sg.Button('Process', disabled = True, key = 'PROCESS'), sg.Button('Cancel')]
+        [sg.Button('Process', disabled = True, key = 'PROCESS'), sg.Button('Cancel'), sg.Button('Delete thread')]
         ]
     
     window = sg.Window('English words', layout = layout, )
@@ -226,6 +232,9 @@ def main():
         
         if event in (sg.WINDOW_CLOSED, 'Cancel'):
             break
+        elif event == 'Delete thread':
+            thread_id = sg.PopupGetText('Thread to delete?')
+            delete_thread(thread_id=)
         elif event == 'READ_SPREADSHEET':
             df = connect_to_spreadsheet()
             words, remaining = get_available_words(df)
