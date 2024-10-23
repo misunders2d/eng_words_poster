@@ -9,13 +9,13 @@ from numpy import nan
 import re
 from oauth2client.service_account import ServiceAccountCredentials
 
-from openai import OpenAI, NOT_GIVEN
+from openai import OpenAI, NOT_GIVEN, NotFoundError
 # import anthropic
 
 ASSISTANT_ID = 'asst_9RsOhqrpjyfCtKqlJQCb56Va'  
 # THREAD_ID = 'thread_bkuZx2KYrj27MxilUBDmXP5x'#'thread_YfDGV3jGfkSo4pBtbkpC5CqG' - to delete
 
-THREAD_ID = 'thread_FJLF4PcM5UbEgcLWLs3A3wri' #testing thread, delete later
+THREAD_ID = 'thread_z6CPL4p0brTKsSqu85lYA6ba' #testing thread, delete later
 
 load_dotenv()
 
@@ -87,7 +87,10 @@ def generate_sound(word: str) -> None:
 def assistant_response(word: str, additional_instr: bool = True) -> str:
     if additional_instr:
         add_instr = 'Start your post with the subject word. Make sure to inclue 1-2 relevant emojis after the title word. Do not put single or double quotes around usage examples'
-    thread = client.beta.threads.retrieve(thread_id = THREAD_ID)
+    try:
+        thread = client.beta.threads.retrieve(thread_id = THREAD_ID)
+    except NotFoundError:
+        thread = client.beta.threads.create()
     content = [{'type':'text','text':word}]
     messages = client.beta.threads.messages.create(thread_id = thread.id, content = content, role = 'user')
     run = client.beta.threads.runs.create_and_poll(
