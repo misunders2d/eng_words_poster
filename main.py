@@ -15,7 +15,7 @@ from openai import OpenAI, NOT_GIVEN, NotFoundError
 ASSISTANT_ID = 'asst_9RsOhqrpjyfCtKqlJQCb56Va'  
 # THREAD_ID = 'thread_bkuZx2KYrj27MxilUBDmXP5x'#'thread_YfDGV3jGfkSo4pBtbkpC5CqG' - to delete
 
-THREAD_ID = 'thread_z6CPL4p0brTKsSqu85lYA6ba' #testing thread, delete later
+THREAD_ID = 'thread_WPMGB3p05d3CNYv4DuqtodEM' #testing thread, delete later
 
 load_dotenv()
 
