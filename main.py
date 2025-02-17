@@ -161,7 +161,8 @@ def structure_json(json_response):
     synonyms = ', '.join(json_response.get('synonyms')) if isinstance(json_response.get('synonyms'), list) else json_response.get('synonyms')
     antonyms = ', '.join(json_response.get('antonyms')) if isinstance(json_response.get('antonyms'), list) else json_response.get('antonyms')
     tags = ', '.join(json_response.get('tags')) if isinstance(json_response.get('tags'), list) else json_response.get('tags')
-    return explanation, origin, usage_examples, synonyms, antonyms, tags
+    quiz_options = json_response.get('quiz_options')
+    return explanation, origin, usage_examples, synonyms, antonyms, tags, quiz_options
 
 
 def process(word, window, additional_instr = True):
@@ -170,18 +171,18 @@ def process(word, window, additional_instr = True):
     json_response = assistant_response(word, additional_instr)
     json_response = json.loads(json_response)
     
-    explanation, origin, usage_examples, synonyms, antonyms, tags = structure_json(json_response)
+    explanation, origin, usage_examples, synonyms, antonyms, tags, quiz_options = structure_json(json_response)
     window['EXPLANATION'].update(explanation) 
     window['ORIGIN'].update(origin) 
     window['EXAMPLES'].update(usage_examples) 
-    window['MISC'].update(f'Synonyms: {synonyms}\nAntonyms: {antonyms}\nTags: {tags}')
+    window['MISC'].update(f'Synonyms: {synonyms}\nAntonyms: {antonyms}\nTags: {tags},\noptions: {','.join(quiz_options)}')
     window['PROCESS'].update(disabled = False)
     window.write_event_value('FINISHED', json_response)
     return None
     
 def post(payload, word):
     audio_str = get_audio(word)
-    explanation, origin, usage_examples, synonyms, antonyms, tags = structure_json(payload)
+    explanation, origin, usage_examples, synonyms, antonyms, tags, quiz_options = structure_json(payload)
     
     full = explanation\
         + '\n\n'\
@@ -191,7 +192,8 @@ def post(payload, word):
         + '\n\nСинонимы: ' + synonyms\
         + '\nАнтонимы: ' + antonyms + '\n\n'\
         + audio_str\
-        + 'тэги: ' + tags
+        + 'тэги: ' + tags\
+        + "опрос: " + ', '.join(quiz_options)
             
     chat_id = CHAT_ID
     text_params = {'chat_id':chat_id, 'text':full}
