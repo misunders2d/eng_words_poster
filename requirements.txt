@@ -1,7 +1,7 @@
+customtkinter
 gspread
 openai
+oauth2client
 pandas
 python-dotenv
-oauth2client
 pyarrow
-PySimpleGUI
