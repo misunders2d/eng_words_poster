@@ -198,7 +198,7 @@ class App(ctk.CTk):
         requests.post(url, params = text_params)
         
         if self.audio_str == '\n\n':
-            image_url =self.generate_image(self.word)
+            image_url =self.generate_image()
             photo_params = {'chat_id':chat_id, 'photo':image_url}
             photo_url = f'https://api.telegram.org/bot{TG_TOKEN}/sendPhoto'
             requests.post(photo_url, params = photo_params)
@@ -229,20 +229,5 @@ def main():
     app = App()
     app.mainloop()
         
-        
-#         elif event == 'Send':
-#             rewrite_check = [rewrite_mapping[key] for key,value in values.items() if key in ('EXP_REWRITE','ORIG_REWRITE','EXMP_REWRITE') and value]
-#             prompt = values['CHAT']
-#             if len(rewrite_check) > 0:
-#                 prompt = f'''Нужно исправить "{'" и "'.join(rewrite_check)}". Всё остальное оставь неизменённым.\n{prompt}'''
-#             window.start_thread(lambda: process(prompt, window, additional_instr=False),('CORRECTED',None))
-        
-
-#         elif event == 'POST':
-#             window['POST'].update(disabled = True)
-#             window.start_thread(lambda: post(payload, word), ('SENDING',None))
-            
-    
-#     window.close()
 if __name__ == '__main__':
     main()
